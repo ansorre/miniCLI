@@ -12,4 +12,4 @@ Small command line helper utilities for Java CLI programs.
 
 ## Quick links
 
- * [Github project](https://github.com/ansorre/As-Libs-Core)
+ * [Github project](https://github.com/ansorre/miniCLI)
