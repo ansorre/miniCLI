@@ -60,6 +60,9 @@ import static me.as.lib.core.system.FileSystemExtras.loadTextFromFile;
 
 public class CommandLineHandler<R>
 {
+ public static final String useHelp = "Use --help to learn how to use this program.";
+
+ // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
  public static <R> R prepare(Class<R> clazz, String args[])
  {
@@ -97,6 +100,7 @@ public class CommandLineHandler<R>
  private int numberOfPassedOptions=0;
  private int numberOfPassedArguments=0;
  private int mandatoryArguments=0;
+ private List<Settings> requiredCLIOptions=new ArrayList<>();
 
 
  private CommandLineHandler(Class<R> clazz, String args[], Problems problems, Localizer localizer)
@@ -205,8 +209,8 @@ public class CommandLineHandler<R>
   CLIOptionHandler res;
   Class<? extends CLIOptionHandler> handlerClass;
 
-  if (option.element2.handlerClass!=null && option.element2.handlerClass!=CLIOptionHandler.class)
-   handlerClass=option.element2.handlerClass;
+  if (option.element2.optionHandlerClass!=null && option.element2.optionHandlerClass!=CLIOptionHandler.class)
+   handlerClass=option.element2.optionHandlerClass;
   else
   {
    Class theType=option.element1.getType();
@@ -243,6 +247,19 @@ public class CommandLineHandler<R>
  }
 
 
+ private void setArgument(BoxFor2<Field, Settings> b2, int argsPos)
+ {
+  CLIArgumentHandler handler;
+
+  if (b2.element2.argumentHandlerClass==CLIArgumentHandler.class)
+   handler=new DefaultCLIArgumentHandler();
+  else
+   handler=ClassExtras.newInstanceByClass(b2.element2.argumentHandlerClass);
+
+  handler.handleArgument(this, argsPos, b2);
+ }
+
+
  private void parseUserArgs(boolean fromConfigFile)
  {
   BoxFor2<Field, Settings> option;
@@ -261,26 +278,37 @@ public class CommandLineHandler<R>
     {
      try
      {
-      BoxFor2<Field, Settings> barg=allArguments.get(numberOfPassedArguments);
+      BoxFor2<Field, Settings> b2;
 
-      ClassExtras.setFieldValue_bruteForce(cliInstance, barg.element1, arg);
+      if (t>=allArguments.size())
+      {
+       b2=allArguments.get(allArguments.size()-1);
+       if (!b2.element2.isMultiValue)
+        throw new RuntimeException("Too many values passed for argument");
+
+      }
+      else
+       b2=allArguments.get(numberOfPassedArguments);
+
+      setArgument(b2, t);
 
       numberOfPassedArguments++;
      }
      catch (Throwable tr)
      {
-      problems.addShowStopper("Invalid arguments or options\nUse --help to learn how to use this program.");
+      problems.addShowStopper("Invalid arguments or options\n"+useHelp);
      }
     }
     else
     {
-     problems.addShowStopper("invalid option '"+arg+"'\nUse --help to learn how to use this program.");
+     problems.addShowStopper("invalid option '"+arg+"'\n"+useHelp);
      return;
     }
    }
    else
    {
     t+=getHandler(option).handleOption(this, t, option);
+    requiredCLIOptions.remove(option.element2);
     numberOfPassedOptions++;
 
     shouldExit=option.element2.execAndExit || problems.areThereShowStoppers();
@@ -290,6 +318,14 @@ public class CommandLineHandler<R>
   if (!fromConfigFile && numberOfPassedOptions>1 && configFileWasSpecified)
   {
    problems.addShowStopper("No other options can be specified if a config file has been passed");
+  }
+
+  if (!shouldExit && (len=requiredCLIOptions.size())>0)
+  {
+   for (t=0;t<len;t++)
+    problems.addShowStopperNoPrefix("Required option '"+requiredCLIOptions.get(t).name+"' has not been specified.");
+
+   problems.addShowStopperNoPrefix(useHelp);
   }
  }
 
@@ -341,9 +377,12 @@ public class CommandLineHandler<R>
      settings.documented=cliOption.documented();
      settings.helpOrder=cliOption.helpOrder();
      settings.required=cliOption.required();
-     settings.handlerClass=cliOption.handlerClass();
+     settings.optionHandlerClass=cliOption.handlerClass();
      settings.execAndExit=cliOption.execAndExit();
      settings.separator=cliOption.separator();
+
+     if (settings.required)
+      requiredCLIOptions.add(settings);
     }
     else
     {
@@ -351,13 +390,13 @@ public class CommandLineHandler<R>
      settings.type=Type.argument;
 
      settings.index=cliArgument.index();
-     settings.configFileName=cliArgument.configFileName();
+     settings.configFileName=cliArgument.nameInConfigFiles();
      settings.usage=cliArgument.usage();
      settings.operand=cliArgument.operand();
      settings.documented=cliArgument.documented();
      settings.required=cliArgument.required();
      settings.missing=cliArgument.missing();
-     settings.handlerClass=cliArgument.handlerClass();
+     settings.argumentHandlerClass=cliArgument.handlerClass();
      settings.execAndExit=cliArgument.execAndExit();
      settings.separator=cliArgument.separator();
 
@@ -464,7 +503,7 @@ public class CommandLineHandler<R>
    }
    catch (Throwable tr)
    {
-    problems.addShowStopper("Exception while reading the config file '"+configFilePath+"'\n"+ExceptionExtras.printDeepCauseStackTrace(tr));
+    problems.addShowStopper("Exception while reading the config file '"+configFilePath+"'\n"+ExceptionExtras.getDeepCauseStackTrace(tr));
     return false;
    }
 

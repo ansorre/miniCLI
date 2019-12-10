@@ -18,10 +18,13 @@
 package me.as.lib.minicli;
 
 
+import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.io.File.pathSeparator;
 
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -31,9 +34,9 @@ public @interface CLIArgument
 
  /**
   * Name of the argument when read from a config file.
-  * When null or empty this argument in not allowed in a config file
+  * When null or empty this argument is not allowed in a config file
   */
- String configFileName() default "";
+ String nameInConfigFiles() default "";
 
  /**
   * Position of the argument.
@@ -108,7 +111,7 @@ public @interface CLIArgument
   * &#64;CLIOption(name="-cp", handler=ClasspathCLIOptionHandler.class) List<String> classpath;
   * </pre>
   */
- Class<? extends CLIOptionHandler> handlerClass() default CLIOptionHandler.class;
+ Class<? extends CLIArgumentHandler> handlerClass() default CLIArgumentHandler.class;
 
  /**
   * When true the program execution terminastes after the CLIOptionHandler processing
@@ -118,10 +121,9 @@ public @interface CLIArgument
  /**
   * When the option is multi-valued (its type is an array or a collection) this is used (by CLIOptionHandler) to determine which is the string that
   * separates the values.
-  * When null or empy it is defaulted to File.pathSeparator
+  * When empty an exception is thrown or if this Annotation is applied to the last CLIArgument successive arguments will be added to this
   */
- String separator() default "";
-
+ String separator() default ",";
 
 
 }

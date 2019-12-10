@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 @CLIOption
 (
  name= "-version",
- aliases={"-v", "./v", "./version", ".--version"},
+ aliases={"-v", "./v", "./version", ".--version", ".--v"},
  usage="print the version of this program to the output stream and exit",
  handlerClass=VersionHandler.class,
  execAndExit=true,

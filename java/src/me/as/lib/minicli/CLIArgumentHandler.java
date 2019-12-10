@@ -17,30 +17,14 @@
 package me.as.lib.minicli;
 
 
-public class Settings
+import me.as.lib.core.extra.BoxFor2;
+
+import java.lang.reflect.Field;
+
+
+public interface CLIArgumentHandler
 {
- enum Type
- {
-  argument,
-  option
- }
 
- public Type type;
-
- public int index;
- public String name;
- public String aliases[];
- public String configFileName;
- public String usage;
- public String operand;
- public boolean documented;
- public int helpOrder;
- public boolean required;
- public String missing;
- public Class<? extends CLIOptionHandler> optionHandlerClass;
- public Class<? extends CLIArgumentHandler> argumentHandlerClass;
- public boolean execAndExit;
- public String separator;
- public boolean isMultiValue=false;
+ void handleArgument(CommandLineHandler handler, int argsPos, BoxFor2<Field, Settings> argument);
 
 }
