@@ -129,6 +129,12 @@ public class CommandLineHandler<R>
   return allOptions;
  }
 
+ public List<BoxFor2<Field, Settings>> getAllArguments()
+ {
+  return allArguments;
+ }
+
+
  public String[] getArgs()
  {
   return args;

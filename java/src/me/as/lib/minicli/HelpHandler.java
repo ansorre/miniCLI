@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static me.as.lib.core.lang.StringExtras.hasChars;
+import static me.as.lib.core.lang.StringExtras.isBlank;
 import static me.as.lib.core.lang.StringExtras.isNotBlank;
 
 
@@ -46,9 +47,15 @@ public class HelpHandler implements CLIOptionHandler
   allOptions=ArrayExtras.clone(allOptions);
   allOptions.sort(Comparator.comparingInt(o -> o.element2.helpOrder));
 
+  allOptions.addAll(handler.getAllArguments());
+
+
   for (BoxFor2<Field, Settings> b2 : allOptions)
   {
-   System.out.print(b2.element2.name);
+   if (isBlank(b2.element2.name))
+    System.out.print("argument");
+   else
+    System.out.print(b2.element2.name);
 
    len=ArrayExtras.length(b2.element2.aliases);
 

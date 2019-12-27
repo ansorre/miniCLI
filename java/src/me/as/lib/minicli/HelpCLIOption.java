@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 (
  name= "--help",
  aliases={"-?", "/?", ".-h", "./h", "./help", ".-help"},
- usage="print this help message to the output stream and exit",
+ usage="prints this help message to the output stream and terminates.",
  handlerClass=HelpHandler.class,
  execAndExit=true,
  configFileName="",

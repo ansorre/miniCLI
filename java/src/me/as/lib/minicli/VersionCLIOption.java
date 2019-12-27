@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 (
  name= "-version",
  aliases={"-v", "./v", "./version", ".--version", ".--v"},
- usage="print the version of this program to the output stream and exit",
+ usage="prints the version of this program to the output stream and terminates.",
  handlerClass=VersionHandler.class,
  execAndExit=true,
  configFileName="",
