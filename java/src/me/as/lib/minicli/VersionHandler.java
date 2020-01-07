@@ -29,9 +29,9 @@ public class VersionHandler implements CLIOptionHandler
 
  public int handleOption(CommandLineHandler handler, int argsPos, BoxFor2<Field, Settings> option)
  {
-  NoOperand<String> verison=(NoOperand<String>)ClassExtras.getFieldValue_bruteForce(handler.getRunnerInstance(), option.element1);
+  NoOperand<String> version=(NoOperand<String>)ClassExtras.getFieldValue_bruteForce(handler.getRunnerInstance(), option.element1);
 
-  System.out.println(verison.customContent);
+  System.out.println(version.customContent);
 
   return 0;
  }
