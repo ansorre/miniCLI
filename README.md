@@ -8,7 +8,7 @@ Small command line helper utilities for Java CLI programs.
  * automatic handling of -help, -version and the like  
  * very easy to use, just read the docs in CLIOption and CLIArgument
  * supports Localizzation, just provide your own Localizer class 
- * Apache 2.0 license
+ * Apache License 2.0
  
 ## Feel like sponsoring this project?  
 **Compliments, it's a very good idea. 🤗**    
